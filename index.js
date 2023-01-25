@@ -2,6 +2,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const app = express()
+require('dotenv').config()
 
 
 
@@ -28,11 +29,11 @@ app.get('/', (req, res) =>{
 //mongodb+srv://kevin:12345@clusterapi.pk8p6ev.mongodb.net/apidatabase?retryWrites=true&w=majority
 
 // entregar uma porta
-const DB_USER = 'kevin'
-const DB_PASSWORD = encodeURIComponent('OVeybSXZL88UR5Tf')
+const DB_USER = process.env.DB_USER
+const DB_PASSWORD = encodeURIComponent(process.env.DB_PASSWORD)
 mongoose.connect(`mongodb+srv://${DB_USER}:${DB_PASSWORD}@clusterapi.pk8p6ev.mongodb.net/?retryWrites=true&w=majority`)
 .then(() =>{
-    console.log("Server Launched Successfully! 🚀")
+    console.log("Rocket Launched Successfully! 🚀")
     app.listen(3000)
 })
 .catch((err) => console.log(err))
