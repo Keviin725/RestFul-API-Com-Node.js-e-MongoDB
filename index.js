@@ -1,10 +1,10 @@
 // configuracao inicial
+require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const app = express()
-require('dotenv').config()
-
-
 
 // Ler o JSON / midddlewares
 app.use(
@@ -26,9 +26,8 @@ app.get('/', (req, res) =>{
     res.json({message: 'First Request!'})
 })
 
-//mongodb+srv://kevin:12345@clusterapi.pk8p6ev.mongodb.net/apidatabase?retryWrites=true&w=majority
 
-// entregar uma porta
+// Conectar a BD
 const DB_USER = process.env.DB_USER
 const DB_PASSWORD = encodeURIComponent(process.env.DB_PASSWORD)
 mongoose.connect(`mongodb+srv://${DB_USER}:${DB_PASSWORD}@clusterapi.pk8p6ev.mongodb.net/?retryWrites=true&w=majority`)
