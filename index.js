@@ -18,7 +18,7 @@ app.use(express.json())
 // rotas da API
 const router = require('./routes/routes')
 
-app.use('/person', router)
+app.use( router)
 
 // rota inicial / endpoint
 app.get('/', (req, res) =>{

@@ -1,11 +1,11 @@
 const router = require('express').Router()
-const Person = require('../models/Person')
+const User = require('../models/User')
 
 // criacao dos dados
-router.post('/', async(req, res) =>{
+router.post('/auth/register', async(req, res) =>{
 
     //req.body
-    const{name, age, approved, cellphone, address} = req.body
+    const{name, email, age, cellphone, address, password} = req.body
 
     if(!name){
         res.status(422).json({error: 'O nome e obrigatorio'})
@@ -15,8 +15,9 @@ router.post('/', async(req, res) =>{
     // objeto que recebe o corpo da requisicao
     const person = {
         name,
+        email,
+        password,
         age,
-        approved,
         cellphone,
         address
     }
@@ -24,7 +25,7 @@ router.post('/', async(req, res) =>{
     // create
     try{
 
-        await Person.create(person)
+        await User.create(person)
         res.status(201).json({message: 'Pessoa inserida com sucesso'})
 
     }catch(error){
@@ -36,20 +37,20 @@ router.post('/', async(req, res) =>{
 //Leitura de dados
 router.get('/', async(req, res) =>{
     try{
-        const people = await Person.find()
+        const people = await User.find()
         res.status(200).json(people)
     }catch(error){
         res.status(500).json({error: error})
     }
 })
 // Retornar dado pelo id
-router.get('/:id', async(req, res) =>{
+router.get('/person/:id', async(req, res) =>{
 
     // extrair o dado da requisicao pela url == req.params
     const id = req.params.id
 
     try {
-      const person = await Person.findOne({_id: id})
+      const person = await User.findOne({_id: id})
 
         if(!person){
             res.status(422).json({message: 'Pessoa nao encontrada'})
@@ -64,20 +65,25 @@ router.get('/:id', async(req, res) =>{
 })
 
 // Update - Atualizacao de dados (PUT, PATCH)
-router.patch('/:id', async(req,res) =>{
+router.put('/update/:id', async(req,res) =>{
     const id = req.params.id
-    const{name, age, approved, cellphone, address} = req.body
+    console.log(req.body)
+    const{name, age, cellphone, address, email,password} = req.body
+    
     const person = {
         name,
+        email,
+        password,
         age,
-        approved,
         cellphone,
         address
     }
 
     try {
-       const updatedPerson = await Person.updateOne({_id: id}, person) 
-       if (updatedPerson.matchedCount ===0) {
+        //console.log(person)
+       const updatedPerson = await User.findByIdAndUpdate({_id: id}, person) 
+       //console.log(updatedPerson)
+       if (updatedPerson.matchedCount === 0) {
         res.status(422).json({message: 'Pessoa nao encontrada'})
         return
        }
@@ -89,10 +95,10 @@ router.patch('/:id', async(req,res) =>{
 })
 
 // Delete 
-router.delete('/:id', async(req,res) => {
+router.delete('/remove/:id', async(req,res) => {
     const id = req.params.id
 
-    const person = await Person.findOne({_id: id})
+    const person = await User.findOne({_id: id})
 
     if(!person){
         res.status(422).json({message: 'Pessoa nao encontrada'})
@@ -100,7 +106,7 @@ router.delete('/:id', async(req,res) => {
     }
 
     try {
-        await Person.deleteOne({_id: id})
+        await User.deleteOne({_id: id})
         res.status(200).json({message: 'Pessoa deletada com sucesso'})
     } catch (error) {
         res.status(500).json({error: error})

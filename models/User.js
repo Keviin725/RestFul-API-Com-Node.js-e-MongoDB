@@ -1,12 +1,14 @@
 const mongoose = require('mongoose')
 
-const Person = mongoose.model('Person', {
+const User = mongoose.model('User', {
    // _id: String,
     name: String,
     age: Number,
+    email: String,
+    password: String,
     cellphone: Number,
     address: String,
     approved: Boolean
 })
 
-module.exports = Person
+module.exports = User
