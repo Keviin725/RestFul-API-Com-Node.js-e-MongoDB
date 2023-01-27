@@ -1,31 +1,66 @@
 const router = require('express').Router()
 const User = require('../models/User')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 // criacao dos dados
 router.post('/auth/register', async(req, res) =>{
 
     //req.body
-    const{name, email, age, cellphone, address, password} = req.body
+    const{name, email, age, cellphone, address, password, confirmPassword} = req.body
 
     if(!name){
-        res.status(422).json({error: 'O nome e obrigatorio'})
-        return
+        return res.status(422).json({error: 'O nome e obrigatorio'})
+        
     }
+    if(!email){
+        return res.status(422).json({error: 'O email e obrigatorio'})
+        
+    }
+    if(!age){
+        return res.status(422).json({error: 'A idade e obrigatoria'})
+        
+    }
+    if(!cellphone){
+        return res.status(422).json({error: 'O numero de telefone e obrigatorio'})
+        
+    }
+    if(!address){
+        return res.status(422).json({error: 'O endereço e obrigatorio'})
+        
+    }
+    if(!password){
+        return res.status(422).json({error: 'A senha e obrigatoria'})
+        
+    }
+    if (password !== confirmPassword) {
+        return res.status(422).json({error: 'As senhas devem ser iguais'})
+    }
+
+    // Verificar se o user existe
+    const userExists = await User.findOne({ email: email })
+
+    if (userExists) {
+        return res.status(422).json({error: 'Este email ja existe, utilize outro'})
+    }
+
+    // Criar senha
+    const salt = await bcrypt.genSalt(12)
+    const passwordHash = await bcrypt.hash(password, salt)
     
     // objeto que recebe o corpo da requisicao
-    const person = {
+    const person = new User({
         name,
         email,
-        password,
+        password: passwordHash,
         age,
         cellphone,
-        address
-    }
+        address,
+    })
 
     // create
     try{
-
-        await User.create(person)
+        await person.save()
         res.status(201).json({message: 'Pessoa inserida com sucesso'})
 
     }catch(error){
@@ -69,7 +104,7 @@ router.put('/update/:id', async(req,res) =>{
     const id = req.params.id
     console.log(req.body)
     const{name, age, cellphone, address, email,password} = req.body
-    
+
     const person = {
         name,
         email,
