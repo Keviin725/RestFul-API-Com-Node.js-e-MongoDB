@@ -11,6 +11,7 @@ app.use(
     })
 )
 
+
 app.use(express.json())
 
 // rotas da API
@@ -18,11 +19,7 @@ const router = require('./routes/routes')
 
 app.use( router)
 
-// rota inicial / endpoint
-app.get('/', (req, res) =>{
 
-    res.json({message: 'First Request!'})
-})
 
 // Credentials
 const DB_USER = process.env.DB_USER

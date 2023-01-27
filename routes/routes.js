@@ -1,3 +1,4 @@
+require('dotenv').config()
 const router = require('express').Router()
 const User = require('../models/User')
 const bcrypt = require('bcrypt')
@@ -95,9 +96,33 @@ router.post('/auth/login', async(req, res) =>{
     const verifyPassword = await bcrypt.compare(password, user.password)
 
     if(!verifyPassword){
-        return res.status(422).json({message: 'Password Incorreta'})
+        return res.status(404).json({message: 'Password Incorreta'})
+    }
+
+    try {
+        const secret = process.env.SECRET
+        const token = jwt.sign({
+            id: user._id
+        }, secret)
+
+        res.status(200).json(token)
+        
+    } catch (error) {
+       console.log(error)
+       res.status(500).json({
+        message: 'Aconteceu um erro no servidor, tente novamente mais tarde!'
+       }) 
     }
 })
+
+function checkToken(req, res, next){
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(" ")[1]
+    
+    if(!token){
+        return res.status(401).json({message: 'Acesso negado'})
+    }
+}
 
 
 //Leitura de dados
@@ -109,21 +134,22 @@ router.get('/', async(req, res) =>{
         res.status(500).json({error: error})
     }
 })
+
 // Retornar dado pelo id
-router.get('/person/:id', async(req, res) =>{
+router.get('/person/:id', checkToken, async(req, res) =>{
 
     // extrair o dado da requisicao pela url == req.params
     const id = req.params.id
 
     try {
-      const person = await User.findOne({_id: id})
+      const user = await User.findOne({_id: id})
 
-        if(!person){
-            res.status(422).json({message: 'Pessoa nao encontrada'})
+        if(!user){
+            res.status(422).json({message: 'User nao encontrada'})
             return
         }
         
-      res.status(200).json(person)
+      res.status(200).json(user)
 
     } catch (error) {
         res.status(500).json({error: error})
