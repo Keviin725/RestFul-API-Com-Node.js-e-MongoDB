@@ -3,12 +3,13 @@ const User = require('../models/User')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
-// criacao dos dados
+// criacao do user
 router.post('/auth/register', async(req, res) =>{
 
     //req.body
     const{name, email, age, cellphone, address, password, confirmPassword} = req.body
 
+    //Validations
     if(!name){
         return res.status(422).json({error: 'O nome e obrigatorio'})
         
@@ -68,6 +69,36 @@ router.post('/auth/register', async(req, res) =>{
     }
 
 })
+
+//Login
+router.post('/auth/login', async(req, res) =>{
+
+    const{email, password} = req.body
+    
+    //validations
+    if(!email){
+        return res.status(422).json({error: 'O email e obrigatorio'})
+        
+    }
+    if(!password){
+        return res.status(422).json({error: 'A senha e obrigatoria'})
+        
+    }
+    // Verificar se o user existe
+    const user = await User.findOne({ email: email })
+
+    if (!user) {
+        return res.status(422).json({error: 'user nao encontrado'})
+    }
+
+    // password validation
+    const verifyPassword = await bcrypt.compare(password, user.password)
+
+    if(!verifyPassword){
+        return res.status(422).json({message: 'Password Incorreta'})
+    }
+})
+
 
 //Leitura de dados
 router.get('/', async(req, res) =>{
