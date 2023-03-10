@@ -49,6 +49,7 @@ router.post('/auth/register', async(req, res) =>{
     // Criar senha
     const salt = await bcrypt.genSalt(12)
     const passwordHash = await bcrypt.hash(password, salt)
+    console.log(passwordHash)
     
     // objeto que recebe o corpo da requisicao
     const person = new User({
